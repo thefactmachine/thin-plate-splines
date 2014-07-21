@@ -1,6 +1,6 @@
 rm(list = ls())
-setwd('/Users/zurich/Google Drive/CURRENT-TO-BE-MOVED/ContourMap')
-library(classInt);library(ggplot2)
+
+library(classInt);library(ggplot2); library(RCurl)
 fnQuantile <- function(vctInput, intNumberDivisions) {
     #returns a factor. Slices up vctInput into intNumberDivisions. 
     #Each slice contains approx same number of observations. Return vector is
@@ -16,7 +16,14 @@ fnReturnColorNumber <- function(obsValue)  {
     colorNumber <- findInterval(obsValue, ci$brks)
     return(colorNumber)
 }
-tData <- read.csv("cleanRaw.csv", header = TRUE, sep = ",")
+
+
+x <- getURL("https://raw.githubusercontent.com/thefactmachine/thin-plate-splines/master/cleanRaw.csv")
+tData <- read.csv(text = x,  header = TRUE, sep = ",")
+
+
+
+
 
 # 1) Aggregation stage. Original data is 365 x 153
 # 86 x 153 is 1.77 aspect

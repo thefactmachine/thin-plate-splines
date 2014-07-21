@@ -1,12 +1,25 @@
 rm(list = ls())
-setwd('/Users/zurich/Google Drive/CURRENT-TO-BE-MOVED/ContourMap')
-library(classInt); library(ggplot2); library(sp); library(fields); library(maptools)
-#load function
-source("fnQuantile.r")
+
+library(classInt); library(ggplot2); library(sp); library(fields); library(maptools); library(RCurl)
+
+fnQuantile <- function(vctInput, intNumberDivisions) {
+  #returns a factor. Slices up vctInput into intNumberDivisions. 
+  #Each slice contains approx same number of observations. Return vector is
+  #the same length as input
+  vctDivisions <- seq(0,1, by = 1 / intNumberDivisions)
+  vctQuantile <- quantile(vctInput, probs = vctDivisions)
+  vctFactor <- cut(vctInput, vctQuantile, 
+                   labels = 1:intNumberDivisions, include.lowest=TRUE)
+  return(vctFactor)
+}
+
+#get the data from Github
+x <- getURL("https://raw.githubusercontent.com/thefactmachine/thin-plate-splines/master/cleanRaw.csv")
+tData <- read.csv(text = x,  header = TRUE, sep = ",")
+#tData is 55845 observations.
 
 
 
-tData <- read.csv("cleanRaw.csv", header = TRUE, sep = ",")
 #need to create aggregates (i.e.bins) Starting with 365 x 153
 #want a visually pleasing 1.7 (16:9) aspect
 tData$dayBin <-as.numeric(fnQuantile(tData$cumDay, 20))
@@ -48,14 +61,10 @@ ci <- classIntervals(tData$temp, n = intDivNum, style = "quantile")
 image(SPDF, "spl_pred", breaks = ci$brks, col = cGrad)
 
 #contour lines
-
 im <- as.image.SpatialGridDataFrame(SPDF["spl_pred"])
 clReturn <- contourLines(im, nlevels = intDivNum, levels = ci$brks)
 #ContourLines2SLDF converts contourLines into a SpatialLinesDF
 cl <- ContourLines2SLDF(clReturn)
-
-
-
 
 
 cGrad <- cr(intDivNum -2)

@@ -1,5 +1,5 @@
 rm(list = ls())
-setwd('/Users/zurich/Google Drive/CURRENT-TO-BE-MOVED/ContourMap')
+
 fnQuantile <- function(vctInput, intNumberDivisions) {
     #returns a factor. Slices up vctInput into intNumberDivisions. 
     #Each slice contains approx same number of observations. Return vector is
@@ -12,9 +12,15 @@ fnQuantile <- function(vctInput, intNumberDivisions) {
 }
 library(classInt)
 library(ggplot2)
+library(RCurl)
 intDivNum <- 11
 
-tData <- read.csv("cleanRaw.csv", header = TRUE, sep = ",")
+x <- getURL("https://raw.githubusercontent.com/thefactmachine/thin-plate-splines/master/cleanRaw.csv")
+tData <- read.csv(text = x,  header = TRUE, sep = ",")
+
+
+
+
 #need to create aggregates. (i.e. bins) Starting with 365 x 153
 # 86 x 153 is 1.77 aspect
 tData$dayBin <-fnQuantile(tData$cumDay, 84)
